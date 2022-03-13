@@ -45,17 +45,8 @@ impl EventHandler for Handler {
             ..msg.content.rfind("```").unwrap()]
             .to_string();
         info!("Running program: {}", &code);
-        let mut runghc = Command::new("timeout")
+        let mut runghc = Command::new("s6-softlimit")
             .args([
-                "-k",
-                &(env::var("KAMELI_TIMELIMIT")
-                    .unwrap_or(String::from("10"))
-                    .parse::<i32>()
-                    .unwrap()
-                    + 2)
-                .to_string(),
-                &env::var("KAMELI_TIMELIMIT").unwrap_or(String::from("10")),
-                "s6-softlimit",
                 "-a",
                 &env::var("KAMELI_MEMLIMIT").unwrap_or(String::from("1000000000")),
                 "-f",
@@ -65,6 +56,8 @@ impl EventHandler for Handler {
                 "sudo",
                 "-u",
                 &env::var("KAMELI_RUNUSER").unwrap_or(String::from("runhaskell")),
+                "timeout",
+                &env::var("KAMELI_TIMELIMIT").unwrap_or(String::from("10")),
                 "runghc",
             ])
             .stdin(Stdio::piped())
