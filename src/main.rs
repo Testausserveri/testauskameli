@@ -53,6 +53,8 @@ impl EventHandler for Handler {
                 &env::var("KAMELI_TIMELIMIT").unwrap_or(String::from("10")),
                 "-f",
                 &env::var("KAMELI_FILELIMIT").unwrap_or(String::from("40000")),
+                "-p",
+                &env::var("KAMELI_PROCESSLIMIT").unwrap_or(String::from("10")),
                 "sudo",
                 "-u",
                 &env::var("KAMELI_RUNUSER").unwrap_or(String::from("runhaskell")),
