@@ -57,8 +57,8 @@ impl EventHandler for Handler {
                 "-u",
                 &env::var("KAMELI_RUNUSER").unwrap_or(String::from("runhaskell")),
                 "timeout",
-                &env::var("KAMELI_TIMELIMIT").unwrap_or(String::from("10")),
                 "-k",
+                &env::var("KAMELI_TIMELIMIT").unwrap_or(String::from("10")),
                 &env::var("KAMELI_TIMELIMIT").unwrap_or(String::from("10")),
                 "runghc",
             ])
