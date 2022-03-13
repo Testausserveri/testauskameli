@@ -791,18 +791,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "runhaskell-discord"
-version = "0.1.0"
-dependencies = [
- "dotenv",
- "openssl-sys",
- "serenity",
- "tokio",
- "tracing",
- "tracing-subscriber",
-]
-
-[[package]]
 name = "rustls"
 version = "0.19.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -997,6 +985,18 @@ dependencies = [
  "proc-macro2",
  "quote",
  "unicode-xid",
+]
+
+[[package]]
+name = "testauskameli"
+version = "0.1.0"
+dependencies = [
+ "dotenv",
+ "openssl-sys",
+ "serenity",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
 ]
 
 [[package]]
