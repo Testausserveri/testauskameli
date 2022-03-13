@@ -63,13 +63,13 @@ impl EventHandler for Handler {
             drop(stdin);
         });
         let output = runghc.wait_with_output().unwrap();
+        let mut stdout = String::from_utf8(output.stdout).unwrap();
+        let mut stderr = String::from_utf8(output.stderr).unwrap();
+        stdout.truncate(984);
+        stderr.truncate(984);
         msg.reply(
             &ctx.http,
-            format!(
-                "```\nstdout:\n{}```\n```\nstderr:\n{}```",
-                String::from_utf8(output.stdout).unwrap(),
-                String::from_utf8(output.stderr).unwrap()
-            ),
+            format!("```\nstdout:\n{}```\n```\nstderr:\n{}```", stdout, stderr),
         )
         .await
         .unwrap();
