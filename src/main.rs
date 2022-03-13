@@ -59,6 +59,7 @@ impl EventHandler for Handler {
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
             .stderr(Stdio::piped())
+            .current_dir("/tmp")
             .spawn()
             .unwrap();
         let mut stdin = runghc.stdin.take().unwrap();
