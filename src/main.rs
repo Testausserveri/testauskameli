@@ -40,7 +40,7 @@ impl EventHandler for Handler {
         let code = msg.content
             [msg.content.find("```hs").unwrap() + 5..msg.content.rfind("```").unwrap()]
             .to_string();
-        dbg!(&code);
+        info!("Runnin program: {}", &code);
         let mut runghc = Command::new("s6-softlimit")
             .args([
                 "-a",
