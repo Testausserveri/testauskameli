@@ -1,0 +1,108 @@
+use std::io::Write;
+use std::process::{Command, Stdio};
+
+use std::{env, sync::Arc};
+
+use serenity::async_trait;
+use serenity::client::bridge::gateway::ShardManager;
+use serenity::model::channel::Message;
+use serenity::model::event::ResumedEvent;
+use serenity::model::gateway::Ready;
+use serenity::prelude::*;
+use tracing::{error, info};
+
+pub struct ShardManagerContainer;
+
+impl TypeMapKey for ShardManagerContainer {
+    type Value = Arc<Mutex<ShardManager>>;
+}
+
+struct Handler;
+
+#[async_trait]
+impl EventHandler for Handler {
+    async fn ready(&self, _: Context, ready: Ready) {
+        info!("Connected as {}", ready.user.name);
+    }
+
+    async fn resume(&self, _: Context, _: ResumedEvent) {
+        info!("Resumed");
+    }
+
+    async fn message(&self, ctx: Context, msg: Message) {
+        let me = ctx.http.get_current_user().await.unwrap().id.0;
+        if !msg.mentions.iter().any(|u| u.id.0 == me) {
+            return;
+        }
+        if !msg.content.contains("```hs") {
+            return;
+        }
+        let code = msg.content
+            [msg.content.find("```hs").unwrap() + 5..msg.content.rfind("```").unwrap()]
+            .to_string();
+        dbg!(&code);
+        let mut runghc = Command::new("s6-softlimit")
+            .args([
+                "-a",
+                "1000000000",
+                "-t",
+                "10",
+                "sudo",
+                "-u",
+                "runhaskell",
+                "runghc",
+            ])
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .spawn()
+            .unwrap();
+        let mut stdin = runghc.stdin.take().unwrap();
+        std::thread::spawn(move || {
+            stdin.write_all(code.as_bytes()).unwrap();
+            drop(stdin);
+        });
+        let output = runghc.wait_with_output().unwrap();
+        msg.reply(
+            &ctx.http,
+            format!(
+                "```\nstdout:\n{}```\n```\nstderr:\n{}```",
+                String::from_utf8(output.stdout).unwrap(),
+                String::from_utf8(output.stderr).unwrap()
+            ),
+        )
+        .await
+        .unwrap();
+    }
+}
+
+#[tokio::main]
+async fn main() {
+    dotenv::dotenv().expect("Failed to load .env file");
+    tracing_subscriber::fmt::init();
+
+    let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
+
+    let mut client = Client::builder(&token)
+        .event_handler(Handler)
+        .await
+        .expect("Err creating client");
+
+    {
+        let mut data = client.data.write().await;
+        data.insert::<ShardManagerContainer>(client.shard_manager.clone());
+    }
+
+    let shard_manager = client.shard_manager.clone();
+
+    tokio::spawn(async move {
+        tokio::signal::ctrl_c()
+            .await
+            .expect("Could not register ctrl+c handler");
+        shard_manager.lock().await.shutdown_all().await;
+    });
+
+    if let Err(why) = client.start().await {
+        error!("Client error: {:?}", why);
+    }
+}
