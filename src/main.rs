@@ -44,12 +44,12 @@ impl EventHandler for Handler {
         let mut runghc = Command::new("s6-softlimit")
             .args([
                 "-a",
-                "1000000000",
+                &env::var("KAMELI_MEMLIMIT").unwrap_or(String::from("1000000000")),
                 "-t",
-                "10",
+                &env::var("KAMELI_TIMELIMIT").unwrap_or(String::from("10")),
                 "sudo",
                 "-u",
-                "runhaskell",
+                &env::var("KAMELI_RUNUSER").unwrap_or(String::from("runhaskell")),
                 "runghc",
             ])
             .stdin(Stdio::piped())

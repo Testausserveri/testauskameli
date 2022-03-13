@@ -15,7 +15,10 @@ kameli yrittää ajaa kyseisen koodin ja tulostaa vastausviestiin sen tulosteen 
 #### .env
 `.env`-nimisessä tiedostossa tulee olla seuraavat muuttujat määriteltyinä:
 ```
-DISCORD_TOKEN=kamelindiscordtoken
+DISCORD_TOKEN=
+KAMELI_MEMLIMIT=
+KAMELI_TIMELIMIT=
+KAMELI_RUNUSER=
 ```
 
 #### Ohjelmistot
@@ -25,7 +28,7 @@ Seuraavat ohjelmistot tulevat olla ladattuna ja kamelin käytettävissä:
 3. runghc
 
 #### Muut
-Kamelia ajavalle koneelle tulee olla luotuna `runhaskell` niminen käyttäjä.
+Kamelia ajavalle koneelle tulee olla luotuna `$KAMELI_RUNUSER` mukainen käyttäjä.
 On suositeltavaa, ettei tällä käyttäjällä ole mitään oikeuksia.
 
 ## Tarkoitus
