@@ -24,8 +24,13 @@ KAMELI_RUNUSER=
 #### Ohjelmistot
 Seuraavat ohjelmistot tulevat olla ladattuna ja kamelin käytettävissä:
 1. s6 (tark. `s6-softlimit`)
-2. sudo
-3. runghc
+2. sudo:
+    `/etc/sudoers`:sta tulisi löytyä vastaava configuraatio:
+    ```
+    %sudo   ALL=(runhaskell) NOPASSWD: ALL
+    ```
+    Jossa `runhaskell` vastaa `$KAMELI_RUNUSER`-muuttujaa
+3. runghc (yleisesti samassa paketissa `ghc`:n kanssa)
 
 #### Muut
 Kamelia ajavalle koneelle tulee olla luotuna `$KAMELI_RUNUSER` mukainen käyttäjä.
