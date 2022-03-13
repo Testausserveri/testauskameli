@@ -34,13 +34,17 @@ impl EventHandler for Handler {
         if !msg.mentions.iter().any(|u| u.id.0 == me) {
             return;
         }
-        if !msg.content.contains("```hs") {
+        let filetype = if msg.content.contains("```hs") {
+            "```hs"
+        } else if msg.content.contains("```haskell") {
+            "```haskell"
+        } else {
             return;
-        }
-        let code = msg.content
-            [msg.content.find("```hs").unwrap() + 5..msg.content.rfind("```").unwrap()]
+        };
+        let code = msg.content[msg.content.find(filetype).unwrap() + filetype.len()
+            ..msg.content.rfind("```").unwrap()]
             .to_string();
-        info!("Runnin program: {}", &code);
+        info!("Running program: {}", &code);
         let mut runghc = Command::new("s6-softlimit")
             .args([
                 "-a",
