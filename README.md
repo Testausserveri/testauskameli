@@ -18,6 +18,7 @@ kameli yrittää ajaa kyseisen koodin ja tulostaa vastausviestiin sen tulosteen 
 DISCORD_TOKEN=
 KAMELI_MEMLIMIT=
 KAMELI_TIMELIMIT=
+KAMELI_FILELIMIT=
 KAMELI_RUNUSER=
 ```
 
