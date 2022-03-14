@@ -1,3 +1,4 @@
+use std::fs::File;
 use std::io::Write;
 use std::process::{Command, Stdio};
 
@@ -44,8 +45,33 @@ impl EventHandler for Handler {
         let code = msg.content[msg.content.find(filetype).unwrap() + filetype.len()
             ..msg.content.rfind("```").unwrap()]
             .to_string();
-        info!("Running program: {}", &code);
-        let mut runghc = Command::new("sudo")
+        info!("Compiling program: {}", &code);
+        let mut file = File::create(format!("/tmp/{}.hs", msg.id.0)).unwrap();
+        file.write_all(code.as_bytes()).unwrap();
+        let ghc = Command::new("ghc")
+            .arg("-o")
+            .arg(msg.id.0.to_string())
+            .args(&mut env::var("GHC_ARGS").unwrap_or_default().split_whitespace())
+            .arg(format!("{}.hs", msg.id.0))
+            .stderr(Stdio::piped())
+            .current_dir("/tmp")
+            .spawn()
+            .unwrap()
+            .wait_with_output()
+            .unwrap();
+        if !ghc.status.success() {
+            msg.reply(
+                &ctx.http,
+                format!(
+                    "Error compiling the code: ```\n{}```",
+                    String::from_utf8(ghc.stderr).unwrap()
+                ),
+            )
+            .await
+            .unwrap();
+            return;
+        }
+        let runghc = Command::new("sudo")
             .args([
                 "-u",
                 &env::var("KAMELI_RUNUSER").unwrap_or(String::from("runhaskell")),
@@ -59,8 +85,8 @@ impl EventHandler for Handler {
                 "-f",
                 &env::var("KAMELI_FILELIMIT").unwrap_or(String::from("40000")),
                 "-p",
-                &env::var("KAMELI_PROCESSLIMIT").unwrap_or(String::from("10")),
-                "runghc",
+                &env::var("KAMELI_PROCESSLIMIT").unwrap_or(String::from("1")),
+                &format!("./{}", msg.id.0),
             ])
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
@@ -68,22 +94,28 @@ impl EventHandler for Handler {
             .current_dir("/tmp")
             .spawn()
             .unwrap();
-        let mut stdin = runghc.stdin.take().unwrap();
-        std::thread::spawn(move || {
-            stdin.write_all(code.as_bytes()).unwrap();
-            drop(stdin);
-        });
         let output = runghc.wait_with_output().unwrap();
         let mut stdout = String::from_utf8(output.stdout).unwrap();
         let mut stderr = String::from_utf8(output.stderr).unwrap();
-        stdout.truncate(984);
-        stderr.truncate(984);
-        msg.reply(
-            &ctx.http,
-            format!("```\nstdout:\n{}```\n```\nstderr:\n{}```", stdout, stderr),
-        )
-        .await
-        .unwrap();
+        stderr.truncate(1950);
+        if !output.status.success() {
+            msg.reply(
+                &ctx.http,
+                format!("Code ran unsuccessfully```{}```", stderr),
+            )
+            .await
+            .unwrap();
+            return;
+        }
+        stdout.truncate(1984);
+        msg.reply(&ctx.http, format!("output```{}```", stdout))
+            .await
+            .unwrap();
+        // Cleanup
+        std::fs::remove_file(format!("/tmp/{}.hs", msg.id.0)).ok();
+        std::fs::remove_file(format!("/tmp/{}", msg.id.0)).ok();
+        std::fs::remove_file(format!("/tmp/{}.hi", msg.id.0)).ok();
+        std::fs::remove_file(format!("/tmp/{}.o", msg.id.0)).ok();
     }
 }
 

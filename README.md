@@ -16,6 +16,7 @@ kameli yrittää ajaa kyseisen koodin ja tulostaa vastausviestiin sen tulosteen 
 `.env`-nimisessä tiedostossa tulee olla seuraavat muuttujat määriteltyinä:
 ```
 DISCORD_TOKEN=
+GHC_ARGS=
 KAMELI_MEMLIMIT=
 KAMELI_TIMELIMIT=
 KAMELI_FILELIMIT=
@@ -32,7 +33,7 @@ Seuraavat ohjelmistot tulevat olla ladattuna ja kamelin käytettävissä:
     %sudo   ALL=(runhaskell) NOPASSWD: ALL
     ```
     Jossa `runhaskell` vastaa `$KAMELI_RUNUSER`-muuttujaa
-3. runghc (yleisesti samassa paketissa `ghc`:n kanssa)
+3. ghc
 
 #### Muut
 Kamelia ajavalle koneelle tulee olla luotuna `$KAMELI_RUNUSER` mukainen käyttäjä.
