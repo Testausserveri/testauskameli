@@ -101,14 +101,14 @@ impl EventHandler for Handler {
         if !output.status.success() {
             msg.reply(
                 &ctx.http,
-                format!("Code ran unsuccessfully```{}```", stderr),
+                format!("Code ran unsuccessfully\n```{}```", stderr),
             )
             .await
             .unwrap();
             return;
         }
         stdout.truncate(1984);
-        msg.reply(&ctx.http, format!("output```{}```", stdout))
+        msg.reply(&ctx.http, format!("output\n```{}```", stdout))
             .await
             .unwrap();
         // Cleanup
