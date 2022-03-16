@@ -20,7 +20,7 @@ pub fn no(what: &str) -> String {
     let height = 40.0;
     let scale = Scale {
         x: height * 2.0,
-        y: height,
+        y: height * 1.2,
     };
 
     // TODO: Make better
