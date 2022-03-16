@@ -9,6 +9,10 @@ Testausserverin siistein botti
 Kun pingaat kamelin viestiin, jossa on Haskell-koodipalikka
 kameli yrittää ajaa kyseisen koodin ja tulostaa vastausviestiin sen tulosteen ja mahdolliset virheet.
 
+### Meemi generaattori
+Kun pingaat kamelin viestiin, joka toteutaa regexin "no\s+(.*)?\?",
+kameli lähettää sinulle hienon meemin
+
 ## Vaatimuksia
 ### Kamelin vaatimat ohjelmistot ja muut
 
@@ -22,6 +26,7 @@ KAMELI_TIMELIMIT=
 KAMELI_FILELIMIT=
 KAMELI_PROCESSLIMIT=
 KAMELI_RUNUSER=
+FONT_PATH=
 ```
 
 #### Ohjelmistot

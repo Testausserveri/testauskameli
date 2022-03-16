@@ -1,7 +1,4 @@
-use std::fs::File;
-use std::io::Write;
-use std::process::{Command, Stdio};
-
+use regex::Regex;
 use std::{env, sync::Arc};
 
 use serenity::async_trait;
@@ -42,13 +39,26 @@ impl EventHandler for Handler {
         } else if msg.content.contains("```haskell") {
             "```haskell"
         } else {
-            return;
+            ""
         };
-        let code = msg.content[msg.content.find(filetype).unwrap() + filetype.len()
-            ..msg.content.rfind("```").unwrap()]
-            .to_string();
-        info!("Compiling program: {}", &code);
-        commands::haskell::compile_and_run(&ctx, msg, &code).await;
+        if filetype.is_empty() {
+            // NO MEME?
+            let re = Regex::new(r"no\s+(.*)?\?").unwrap();
+            if let Some(cap) = re.captures_iter(&msg.content).next() {
+                commands::meme_generator::no(cap.get(1).unwrap().as_str());
+                msg.channel_id
+                    .send_message(&ctx.http, |m| m.add_file("test.png"))
+                    .await
+                    .unwrap();
+            };
+            return;
+        } else {
+            let code = msg.content[msg.content.find(filetype).unwrap() + filetype.len()
+                ..msg.content.rfind("```").unwrap()]
+                .to_string();
+            info!("Compiling program: {}", &code);
+            commands::haskell::compile_and_run(&ctx, msg, &code).await;
+        }
     }
 }
 
