@@ -30,8 +30,7 @@ impl EventHandler for Handler {
     }
 
     async fn message(&self, ctx: Context, msg: Message) {
-        let me = ctx.http.get_current_user().await.unwrap().id.0;
-        if !msg.mentions.iter().any(|u| u.id.0 == me) {
+        if msg.is_own(&ctx) || msg.author.bot || !msg.mentions_me(&ctx.http) {
             return;
         }
         let filetype = if msg.content.contains("```hs") {
