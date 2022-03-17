@@ -2,6 +2,7 @@ use image::io::Reader as ImageReader;
 use image::{Pixel, Rgb};
 use imageproc::drawing::draw_text_mut;
 use rusttype::{Font, Scale};
+use std::cmp::min;
 use std::fs::File;
 use std::io::Read;
 use std::path::Path;
@@ -25,18 +26,22 @@ pub fn no(what: &str) -> String {
 
     // TODO: Make better
     let mut text = format!("NO {}?", what.to_uppercase());
-    text.truncate(18);
-    let x = (18 - text.len()) / 2;
-    draw_text_mut(
-        &mut img,
-        Rgb::from([255u8, 255u8, 255u8]).to_rgba(),
-        (x as f32 * scale.y) as u32,
-        10,
-        scale,
-        &font,
-        &text,
-    );
-
+    let mut y = 10;
+    while !text.is_empty() {
+        let e = min(text.len(), 17);
+        let k: String = text.drain(..e).collect();
+        let x = (17 - k.len()) / 2;
+        draw_text_mut(
+            &mut img,
+            Rgb::from([255u8, 255u8, 255u8]).to_rgba(),
+            (x as f32 * scale.y) as u32,
+            y,
+            scale,
+            &font,
+            &k,
+        );
+        y += scale.y as u32;
+    }
     img.save(path).unwrap();
     String::from("test.png")
 }
