@@ -1,3 +1,4 @@
+//! A default implementation for generating memes with "No bitches?" Megamind
 use anyhow::Result;
 use async_trait::async_trait;
 use either::Either;
@@ -15,11 +16,14 @@ use std::path::Path;
 
 use crate::{Mismatch, MrSnippet, Runner, RunnerOutput};
 
+/// No meme handler. Contains a compiled regex because
+/// compiling it again for every message is an animalistic practice
 pub struct NoMeme {
     regex: Regex,
 }
 
 impl NoMeme {
+    /// Create a new [`NoMeme`] handler. No Snippet?
     pub fn new() -> Self {
         Self {
             regex: Regex::new(r"no\s+(.*)?\?").unwrap(),

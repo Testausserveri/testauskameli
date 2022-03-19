@@ -1,3 +1,4 @@
+//! Safely run something in an async-friendly way
 use std::env;
 use std::ffi::{OsStr, OsString};
 use std::future::Future;
@@ -7,6 +8,10 @@ use std::process::Output;
 
 use async_process::Command as AsyncCommand;
 
+/// Command runner
+///
+/// Uses `sudo` and `s6-softlimit` to run commands
+/// as a different user and limit its resources from Mixu
 pub struct Command {
     program: OsString,
     args: Vec<OsString>,
@@ -18,10 +23,28 @@ pub struct Command {
     current_dir: Option<PathBuf>,
 }
 
+/// Temp-file guard, to prevent early deletion
+///
+/// The [`Command`] uses **tempfile** to create temporary files
+/// for where to run the code and where and how to store it. These
+/// are not always used, and sometimes, only a directory may be necessary.
+///
+/// As a result, it is necessary to return the tempfiles and make sure
+/// they are not dropped before the command is run.
+///
+/// Therefore, most run methods return a tuple of a future and `Files`, such as:
+/// ```rust,no_run
+/// let (output, _files) = Command::unlimited("haskell-runner")
+///     .run_with_content(code.as_bytes(), Some("hs"));
+/// ```
 pub enum Files {
+    /// No temporary files were necessary
     None,
+    /// Only a temporary directory was created
     Dir(tempfile::TempDir),
+    /// A temporary files was needed, but directory was set by outside forces
     File(tempfile::NamedTempFile),
+    /// Both a directory and a file were needed
     DirAndFile(tempfile::TempDir, tempfile::NamedTempFile),
 }
 
@@ -47,6 +70,8 @@ macro_rules! run_cmd {
 }
 
 impl Command {
+    /// Create a new [`Command`] for program. This is a restricted usecase,
+    /// and limits will be imposed on the running program. Check crate repo root for env var information
     pub fn new<S: AsRef<OsStr>>(program: S) -> Self {
         Self {
             program: program.as_ref().to_os_string(),
@@ -69,6 +94,7 @@ impl Command {
         }
     }
 
+    /// Create a new [`Command`] which is almost unlimited
     pub fn unlimited<S: AsRef<OsStr>>(program: S) -> Self {
         Self {
             program: program.as_ref().to_os_string(),
@@ -84,11 +110,13 @@ impl Command {
         }
     }
 
+    /// Add an argument
     pub fn arg<S: AsRef<OsStr>>(mut self, arg: S) -> Self {
         self.args.push(arg.as_ref().to_os_string());
         self
     }
 
+    /// Extend arguments with a list (which can be empty)
     pub fn args<I, S>(mut self, args: I) -> Self
     where
         I: IntoIterator<Item = S>,
@@ -99,11 +127,16 @@ impl Command {
         self
     }
 
+    /// Set, in which directory command should be executed. This
+    /// makes it unnecessary to create a temporary directory and so it won't
+    /// be created
     pub fn current_dir<P: AsRef<Path>>(mut self, dir: P) -> Self {
         self.current_dir = Some(dir.as_ref().to_owned());
         self
     }
 
+    /// Run a command without creating anything temporary and appending a file.
+    /// Will run in CWD if current_dir is unset
     pub fn run(self) -> impl Future<Output = IoResult<Output>> {
         if let Some(ref dir) = self.current_dir {
             run_cmd!(self).arg(self.program).current_dir(dir).output()
@@ -112,6 +145,10 @@ impl Command {
         }
     }
 
+    /// Run on content provided as bytes (can be string or otherwise). Content will
+    /// be placed into a temporary file and appendend to the command. An extension can optionally
+    /// be given to the command as the last argument, which a script can use to create properly
+    /// named files from the input
     pub fn run_with_content(
         self,
         content: &[u8],
@@ -152,6 +189,7 @@ impl Command {
         (future, files)
     }
 
+    /// Same as run, but appends a series of paths as arguments
     pub fn run_with_paths(
         self,
         paths: &[PathBuf],
