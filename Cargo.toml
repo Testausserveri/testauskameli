@@ -2,7 +2,7 @@
 name = "testauskameli"
 version = "0.1.0"
 edition = "2021"
-authors = ["Luukas Pörtfors <lajp@iki.fi>"]
+authors = ["Luukas Pörtfors <lajp@iki.fi>", "Lukáš Hozda <me@mag.wiki>"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -27,3 +27,10 @@ dotenv = "0.15"
 tracing = "0.1"
 tracing-subscriber = "0.2"
 regex = "1.5.5"
+async-process = "1.3.0"
+anyhow = "1.0.53"
+either = "1.6.1"
+async-trait = "0.1.52"
+flume = "0.10.10"
+tempfile = "3.3.0"
+dashmap = "5.0.0"
