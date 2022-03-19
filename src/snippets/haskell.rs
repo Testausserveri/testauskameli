@@ -1,3 +1,4 @@
+//! A Haskell service
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use either::Either;
@@ -6,7 +7,8 @@ use tracing::*;
 use crate::cmd::Command;
 use crate::{Mismatch, MrSnippet, Runner, RunnerOutput};
 
-struct Haskell;
+/// The service for Haskell needs to data so far, and so it is a unit struct
+pub struct Haskell;
 
 #[async_trait]
 impl MrSnippet for Haskell {
@@ -15,6 +17,7 @@ impl MrSnippet for Haskell {
         //    - check for haskell install
         //    - check for haskell runner script
         //    - idk if anything else will be needed
+        //      (would we include s6 tools here?)
         Ok(())
     }
 
@@ -57,10 +60,12 @@ impl MrSnippet for Haskell {
                 let output = output.await?;
 
                 if output.status.success() {
+                    info!("Haskell finished with success");
                     let mut stdout = String::from_utf8(output.stdout).unwrap();
                     stdout.truncate(1900);
                     Ok(RunnerOutput::Output(stdout))
                 } else {
+                    info!("Haskell finished with error");
                     let mut stderr = String::from_utf8(output.stderr).unwrap();
                     stderr.truncate(1950);
                     // TODO: there might still be some output, ie. in case of Rust with warnings,
