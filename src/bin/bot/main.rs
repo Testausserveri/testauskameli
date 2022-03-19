@@ -8,6 +8,7 @@ use serenity::model::gateway::Ready;
 use serenity::prelude::*;
 use tracing::{error, info};
 
+use testauskameli::snippets::register_all;
 use testauskameli::Executor;
 
 mod executor;
@@ -26,10 +27,11 @@ struct Handler {
 impl Handler {
     fn new() -> Self {
         let executor = DiscordExecutor::new();
+        register_all(&executor);
+
         let (sender, receiver) = flume::unbounded();
 
         tokio::spawn(async move { executor.run(receiver).await });
-
         Self { sender }
     }
 }
