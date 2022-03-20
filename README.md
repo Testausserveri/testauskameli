@@ -13,6 +13,10 @@ kameli yrittää ajaa kyseisen koodin ja tulostaa vastausviestiin sen tulosteen 
 Kun pingaat kamelin viestiin, joka toteutaa regexin "no\s+(.*)?\?",
 kameli lähettää sinulle hienon meemin
 
+### Echo
+Kun pingaat kamelin viestiin, joka alkaa sanalla "echo", kameli lähettää sinulle loput viestistä.
+Hyödyllinen testaukseen.
+
 ## Vaatimuksia
 ### Kamelin vaatimat ohjelmistot ja muut
 
