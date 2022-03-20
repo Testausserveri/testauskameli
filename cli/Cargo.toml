@@ -18,7 +18,7 @@ dotenv = "0.15"
 
 [dependencies.tokio]
 version = "1.13"
-features = ["macros", "rt-multi-thread", "signal"]
+features = ["macros", "rt-multi-thread", "signal", "io-std"]
 
 [dependencies.testauskameli]
 version = "0.1.0"
