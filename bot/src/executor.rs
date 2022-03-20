@@ -3,6 +3,7 @@ use std::sync::Arc;
 use anyhow::Result;
 use async_trait::async_trait;
 use dashmap::DashMap;
+use tracing::*;
 
 use testauskameli::Executor;
 use testauskameli::MrSnippet;
@@ -54,7 +55,7 @@ impl Executor for DiscordExecutor {
                     )
                     .await?;
             }
-            RunnerOutput::WithFiles(output, files) => {
+            RunnerOutput::WithFiles(output, files, delete) => {
                 message
                     .channel_id
                     .send_message(&context.http, |m| {
@@ -65,6 +66,14 @@ impl Executor for DiscordExecutor {
                         m.reference_message(message)
                     })
                     .await?;
+
+                if delete {
+                    for file in &files {
+                        if let Err(e) = tokio::fs::remove_file(&file).await {
+                            error!("failed to delete file {}: {}", file.display(), e);
+                        }
+                    }
+                }
             }
             RunnerOutput::WrongUsage(error) => {
                 message
