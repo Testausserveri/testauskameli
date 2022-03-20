@@ -65,6 +65,20 @@ macro_rules! run_cmd {
             .arg($self.file_limit.to_string())
             .arg("-p")
             .arg($self.proc_limit.to_string())
+            .env("KAMELI_FILELIMIT", $self.file_limit.to_string())
+            .env("KAMELI_MEMLIMIT", $self.mem_limit.to_string())
+            .env("KAMELI_PROCESSLIMIT", $self.proc_limit.to_string())
+            .arg("env")
+            .arg(&format!(
+                "KAMELI_FILELIMIT={}",
+                $self.file_limit.to_string()
+            ))
+            .arg(&format!("KAMELI_MEMLIMIT={}", $self.mem_limit.to_string()))
+            .arg(&format!(
+                "KAMELI_PROCESSLIMIT={}",
+                $self.proc_limit.to_string()
+            ))
+            .arg(&$self.program)
             .args($self.args.iter())
     };
 }
@@ -165,7 +179,6 @@ impl Command {
         let future = match self.current_dir {
             Some(dir) => run_cmd!(self)
                 .current_dir(dir)
-                .arg(self.program)
                 .arg(file_buf)
                 .args(extension.into_iter().collect::<Vec<_>>())
                 .output(),
@@ -179,7 +192,6 @@ impl Command {
 
                 run_cmd!(self)
                     .current_dir(&path_buf)
-                    .arg(self.program)
                     .arg(file_buf)
                     .args(extension.into_iter().collect::<Vec<_>>())
                     .output()
@@ -197,21 +209,13 @@ impl Command {
         let mut files = Files::None;
 
         let future = match self.current_dir {
-            Some(ref dir) => run_cmd!(self)
-                .current_dir(dir)
-                .arg(self.program)
-                .args(paths)
-                .output(),
+            Some(ref dir) => run_cmd!(self).current_dir(dir).args(paths).output(),
             None => {
                 let tmp_dir = tempfile::TempDir::new().expect("BUG: could not create temp dir");
                 let buf: PathBuf = tmp_dir.as_ref().to_owned();
                 files = Files::Dir(tmp_dir);
 
-                run_cmd!(self)
-                    .current_dir(buf)
-                    .arg(self.program)
-                    .args(paths)
-                    .output()
+                run_cmd!(self).current_dir(buf).args(paths).output()
             }
         };
 
