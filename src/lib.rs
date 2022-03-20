@@ -189,7 +189,7 @@ pub trait Executor {
                             info!("match found: {}", handler.name());
                             let output = runner.dispatch().await?;
 
-                            debug!("dispatch finnished :)");
+                            info!("dispatch finnished :)");
                             self.send(output, &context)
                                 .await
                                 .context("failed to send message after success")?;
