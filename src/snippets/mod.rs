@@ -1,5 +1,6 @@
 //! default provided implementations for [`MrSnippet`]
 
+pub mod echo;
 pub mod haskell;
 pub mod nomeme;
 
@@ -10,4 +11,5 @@ where
 {
     executor.register(Box::new(haskell::Haskell));
     executor.register(Box::new(nomeme::NoMeme::new()));
+    executor.register(Box::new(echo::Echo));
 }
