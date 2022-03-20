@@ -3,6 +3,7 @@ use std::sync::Arc;
 use anyhow::Result;
 use async_trait::async_trait;
 use dashmap::DashMap;
+use tracing::*;
 
 use testauskameli::Executor;
 use testauskameli::MrSnippet;
@@ -34,8 +35,33 @@ impl Executor for CliExecutor {
         Box::new(self.handlers.iter().map(|v| v.value().clone()))
     }
 
-    async fn send(&self, _content: RunnerOutput, _context: &Self::Context) -> Result<()> {
-        println!("This is where I'd put my sender, if I had one");
+    async fn send(&self, content: RunnerOutput, _context: &Self::Context) -> Result<()> {
+        match content {
+            RunnerOutput::Output(text) => {
+                info!("output type: Output");
+                println!("Output:\n\n{}", text);
+            }
+            RunnerOutput::WithError(text, error) => {
+                info!("output type: WithError");
+                println!("Output:\n\n{}\nError:{}", text, error);
+            }
+            RunnerOutput::WithFiles(text, files, delete) => {
+                info!("output type: WithFiles");
+                println!("Output:\n\n{}\n", text);
+                println!("The following files were also created");
+                for file in files {
+                    println!("    - {}", file.display());
+                }
+                println!("File deletion hint: {}", delete);
+            }
+            RunnerOutput::WrongUsage(error) => {
+                info!("output type: WrongUsage");
+                println!("Wrong usage: {}", error);
+            }
+            RunnerOutput::None => {
+                info!("output type: None");
+            }
+        }
         Ok(())
     }
 }
