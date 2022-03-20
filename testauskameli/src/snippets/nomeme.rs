@@ -12,8 +12,8 @@ use rusttype::{Font, Scale};
 use std::cmp::min;
 use std::fs::File;
 use std::io::Read;
-use std::path::Path;
 
+use crate::utils;
 use crate::{Mismatch, MrSnippet, Runner, RunnerOutput};
 
 /// No meme handler. Contains a compiled regex because
@@ -54,7 +54,7 @@ impl MrSnippet for NoMeme {
 
         Either::Left(Runner::new("no meme", "no meme", || {
             Box::pin(async move {
-                let path = Path::new("test.png");
+                let path = utils::rand_path_with_extension(".png");
                 let mut img = ImageReader::open("img/no.png").unwrap().decode().unwrap();
 
                 let mut font = Vec::new();
@@ -88,8 +88,8 @@ impl MrSnippet for NoMeme {
                     );
                     y += scale.y as u32;
                 }
-                img.save(path).unwrap();
-                Ok(RunnerOutput::WithFiles("".into(), vec!["test.png".into()]))
+                img.save(&path).unwrap();
+                Ok(RunnerOutput::WithFiles("".into(), vec![path.into()], true))
             })
         }))
     }

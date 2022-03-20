@@ -61,8 +61,10 @@ pub enum RunnerOutput {
     Output(String),
     /// If there were also some errors. First member of tuple is output, second error (stderr)
     WithError(String, String),
-    /// stdout, and a vector of paths that should be attached to the response
-    WithFiles(String, Vec<PathBuf>),
+    /// stdout, and a vector of paths that should be attached to the response,
+    /// the final bool hints to the executor, that the files should be deleted
+    /// afterwards. The executor may or may not respect it
+    WithFiles(String, Vec<PathBuf>, bool),
     /// Should be only emitted by the [`Executor`] in case of [`Mismatch::WrongUsage`]
     WrongUsage(String),
 }
