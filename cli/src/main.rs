@@ -23,7 +23,7 @@ async fn main() {
     let (sender, receiver) = flume::unbounded();
     let task = tokio::spawn(async move { executor.run(receiver).await });
 
-    let arg = env::args().next();
+    let arg = env::args().skip(1).next();
 
     let input = match (&arg).into_iter().map(|x| x.as_ref()).next() {
         None | Some("-") => {
