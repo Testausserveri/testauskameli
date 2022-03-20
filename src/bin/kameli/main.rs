@@ -10,10 +10,11 @@ use crate::executor::CliExecutor;
 async fn main() {
     dotenv::dotenv().expect("Failed to load .env file");
     tracing_subscriber::fmt::init();
-    info!("ayo les go");
+    info!("starting kameli cli");
 
     let executor = CliExecutor::new();
     register_all(&executor);
+    info!("executor started");
 
     let (_sender, receiver) = flume::unbounded();
     tokio::spawn(async move { executor.run(receiver).await });
