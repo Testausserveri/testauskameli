@@ -178,6 +178,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "bot"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "dashmap",
+ "dotenv",
+ "either",
+ "flume",
+ "openssl-sys",
+ "serenity",
+ "testauskameli",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
 name = "bumpalo"
 version = "3.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -236,6 +254,22 @@ dependencies = [
  "num-traits",
  "serde",
  "winapi",
+]
+
+[[package]]
+name = "cli"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "dashmap",
+ "dotenv",
+ "either",
+ "flume",
+ "testauskameli",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
 ]
 
 [[package]]
@@ -1638,16 +1672,12 @@ dependencies = [
  "anyhow",
  "async-process",
  "async-trait",
- "dashmap",
- "dotenv",
  "either",
  "flume",
  "image",
  "imageproc",
- "openssl-sys",
  "regex",
  "rusttype",
- "serenity",
  "tempfile",
  "tokio",
  "tracing",
