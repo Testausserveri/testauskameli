@@ -20,6 +20,7 @@ use async_trait::async_trait;
 
 pub mod cmd;
 pub mod snippets;
+pub mod utils;
 
 /// A type indicating to the executor how to proceed in case of mismatch
 ///

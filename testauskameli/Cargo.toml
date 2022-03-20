@@ -19,6 +19,7 @@ either = "1.6.1"
 async-trait = "0.1.52"
 flume = "0.10.10"
 tempfile = "3.3.0"
+rand = "0.8.4"
 
 # image deps
 imageproc = { version = "0.22.0", optional = true }
