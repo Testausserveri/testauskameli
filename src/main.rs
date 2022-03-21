@@ -42,7 +42,7 @@ impl EventHandler for Handler {
         };
         if filetype.is_empty() {
             // NO MEME?
-            let re = Regex::new(r"no\s+(.*)?\?").unwrap();
+            let re = Regex::new(r"(?i)no\s+(.*)?\?").unwrap();
             if let Some(cap) = re.captures_iter(&msg.content).next() {
                 commands::meme_generator::no(cap.get(1).unwrap().as_str());
                 msg.channel_id
