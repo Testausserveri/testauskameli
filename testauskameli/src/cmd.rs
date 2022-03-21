@@ -3,6 +3,7 @@ use std::env;
 use std::ffi::{OsStr, OsString};
 use std::future::Future;
 use std::io::{Result as IoResult, Write};
+use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
 use std::process::Output;
 
@@ -181,6 +182,12 @@ impl Command {
     ) -> (impl Future<Output = IoResult<Output>>, Files) {
         let mut tmp_file = tempfile::NamedTempFile::new().expect("BUG: could not create temp file");
         let file_buf: PathBuf = tmp_file.as_ref().into();
+        let mut perms = std::fs::metadata(&file_buf)
+            .expect("BUG: could not get temp file metadata")
+            .permissions();
+        perms.set_mode(0o644);
+        std::fs::set_permissions(&file_buf, perms)
+            .expect("BUG: unable to set temp file permissions");
         tmp_file
             .write_all(content)
             .expect("BUG: failed to write file :()");
@@ -196,6 +203,12 @@ impl Command {
             None => {
                 let tmp_dir = tempfile::TempDir::new().expect("BUG: could not create temp dir");
                 let path_buf: PathBuf = tmp_dir.as_ref().to_owned();
+                let mut perms = std::fs::metadata(&path_buf)
+                    .expect("BUG: could not get temp dir metadata")
+                    .permissions();
+                perms.set_mode(0o777);
+                std::fs::set_permissions(&path_buf, perms)
+                    .expect("BUG: unable to set temp dir permissions");
 
                 if let Files::File(file) = files {
                     files = Files::DirAndFile(tmp_dir, file);
@@ -224,6 +237,12 @@ impl Command {
             None => {
                 let tmp_dir = tempfile::TempDir::new().expect("BUG: could not create temp dir");
                 let buf: PathBuf = tmp_dir.as_ref().to_owned();
+                let mut perms = std::fs::metadata(&buf)
+                    .expect("BUG: could not get temp dir metadata")
+                    .permissions();
+                perms.set_mode(0o777);
+                std::fs::set_permissions(&buf, perms)
+                    .expect("BUG: unable to set temp dir permissions");
                 files = Files::Dir(tmp_dir);
 
                 run_cmd!(self).current_dir(buf).args(paths).output()
