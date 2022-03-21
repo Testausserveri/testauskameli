@@ -26,7 +26,7 @@ impl NoMeme {
     /// Create a new [`NoMeme`] handler. No Snippet?
     pub fn new() -> Self {
         Self {
-            regex: Regex::new(r"no\s+(.*)?\?").unwrap(),
+            regex: Regex::new(r"(?i)no\s+(.*)?\?").unwrap(),
         }
     }
 }
