@@ -68,6 +68,7 @@ macro_rules! run_cmd {
             .env("KAMELI_FILELIMIT", $self.file_limit.to_string())
             .env("KAMELI_MEMLIMIT", $self.mem_limit.to_string())
             .env("KAMELI_PROCESSLIMIT", $self.proc_limit.to_string())
+            .env("KAMELI_TIMELIMIT", $self.time_limit.to_string())
             .arg("env")
             .arg(&format!(
                 "KAMELI_FILELIMIT={}",
@@ -75,8 +76,18 @@ macro_rules! run_cmd {
             ))
             .arg(&format!("KAMELI_MEMLIMIT={}", $self.mem_limit.to_string()))
             .arg(&format!(
+                "KAMELI_TIMELIMIT={}",
+                $self.time_limit.to_string()
+            ))
+            .arg(&format!(
                 "KAMELI_PROCESSLIMIT={}",
                 $self.proc_limit.to_string()
+            ))
+            // this needs a better solution
+            // TODO: unhardcore
+            .arg(&format!(
+                "GHC_ARGS={}",
+                std::env::var("GHC_ARGS").unwrap_or_default()
             ))
             .arg(&$self.program)
             .args($self.args.iter())
