@@ -51,7 +51,10 @@ impl Executor for DiscordExecutor {
                 message
                     .reply(
                         &context.http,
-                        format!("Output:\n```\n{}\n```\nError:\n```\n{}\n```", output, error),
+                        format!(
+                            "Output:\n```\n{}\n\n```\nError:\n```\n{}\n```",
+                            output, error
+                        ),
                     )
                     .await?;
             }
