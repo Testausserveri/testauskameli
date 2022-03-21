@@ -1,0 +1,9 @@
+#!/bin/sh
+# Compile and run a Haskell program
+# $1 = filename
+# $2 = extension (unused)
+
+cp "$1" main.hs
+ghc $GHC_ARGS main.hs > /dev/null
+
+timeout -s KILL "$KAMELI_TIMELIMIT" s6-softlimit -a "$KAMELI_MEMLIMIT" -f "$KAMELI_FILELIMIT" -p "$KAMELI_PROCESSLIMIT" ./main || exit 1

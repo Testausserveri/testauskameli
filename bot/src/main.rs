@@ -1,4 +1,3 @@
-use regex::Regex;
 use std::{env, sync::Arc};
 
 use serenity::async_trait;
@@ -9,7 +8,11 @@ use serenity::model::gateway::Ready;
 use serenity::prelude::*;
 use tracing::{error, info};
 
-mod commands;
+use testauskameli::snippets::register_all;
+use testauskameli::Executor;
+
+mod executor;
+use crate::executor::DiscordExecutor;
 
 pub struct ShardManagerContainer;
 
@@ -17,7 +20,21 @@ impl TypeMapKey for ShardManagerContainer {
     type Value = Arc<Mutex<ShardManager>>;
 }
 
-struct Handler;
+struct Handler {
+    sender: flume::Sender<(String, <DiscordExecutor as Executor>::Context)>,
+}
+
+impl Handler {
+    fn new() -> Self {
+        let executor = DiscordExecutor::new();
+        register_all(&executor);
+
+        let (sender, receiver) = flume::unbounded();
+
+        tokio::spawn(async move { executor.run(receiver).await });
+        Self { sender }
+    }
+}
 
 #[async_trait]
 impl EventHandler for Handler {
@@ -33,30 +50,13 @@ impl EventHandler for Handler {
         if msg.author.bot || !msg.mentions_me(&ctx.http).await.unwrap_or(false) {
             return;
         }
-        let filetype = if msg.content.contains("```hs") {
-            "```hs"
-        } else if msg.content.contains("```haskell") {
-            "```haskell"
-        } else {
-            ""
-        };
-        if filetype.is_empty() {
-            // NO MEME?
-            let re = Regex::new(r"(?i)no\s+(.*)?\?").unwrap();
-            if let Some(cap) = re.captures_iter(&msg.content).next() {
-                commands::meme_generator::no(cap.get(1).unwrap().as_str());
-                msg.channel_id
-                    .send_message(&ctx.http, |m| m.add_file("test.png"))
-                    .await
-                    .unwrap();
-            };
-            return;
-        } else {
-            let code = msg.content[msg.content.find(filetype).unwrap() + filetype.len()
-                ..msg.content.rfind("```").unwrap()]
-                .to_string();
-            info!("Compiling program: {}", &code);
-            commands::haskell::compile_and_run(&ctx, msg, &code).await;
+
+        if let Err(e) = self
+            .sender
+            .send_async((msg.content.to_string(), (ctx, msg)))
+            .await
+        {
+            error!("failed to send data to executor, is it running? [{}]", e);
         }
     }
 }
@@ -69,7 +69,7 @@ async fn main() {
     let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
 
     let mut client = Client::builder(&token)
-        .event_handler(Handler)
+        .event_handler(Handler::new())
         .await
         .expect("Err creating client");
 
