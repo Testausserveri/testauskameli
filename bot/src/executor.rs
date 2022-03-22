@@ -51,10 +51,14 @@ impl Executor for DiscordExecutor {
                 message
                     .reply(
                         &context.http,
-                        format!(
-                            "Output:\n```\n{}\n\n```\nError:\n```\n{}\n```",
-                            output, error
-                        ),
+                        if output.trim().is_empty() {
+                            format!("Error:\n```\n{}\n\n```", error)
+                        } else {
+                            format!(
+                                "Output:\n```\n{}\n\n```\nError:\n```\n{}\n```",
+                                output, error
+                            )
+                        },
                     )
                     .await?;
             }
@@ -65,7 +69,9 @@ impl Executor for DiscordExecutor {
                         for file in &files {
                             m.add_file(file);
                         }
-                        m.content(output);
+                        if !output.trim().is_empty() {
+                            m.content(output);
+                        }
                         m.reference_message(message)
                     })
                     .await?;
