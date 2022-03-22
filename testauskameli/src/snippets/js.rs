@@ -22,10 +22,10 @@ impl MrSnippet for JS {
     }
 
     async fn try_or_continue(&self, content: &str) -> Either<Runner, Mismatch> {
-        let start = match (content.contains("```js"), content.contains("```js")) {
-            (true, _) => content.find("```js").expect("BUG: impossible") + "```js".len(),
-            (false, true) => content.find("```js").expect("BUG: impossible") + "```js".len(),
-            _ => return Either::Right(Mismatch::Continue),
+        let start = if content.contains("```js") {
+            content.find("```js").expect("BUG: impossible") + "```js".len()
+        } else {
+            return Either::Right(Mismatch::Continue);
         };
 
         let end = match content.rfind("```") {
