@@ -3,8 +3,8 @@
 pub mod c;
 pub mod echo;
 pub mod haskell;
-pub mod nomeme;
 pub mod js;
+pub mod nomeme;
 
 /// Register every service currently available with default configuration
 pub fn register_all<T>(executor: &T)
