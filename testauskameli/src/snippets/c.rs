@@ -22,10 +22,10 @@ impl MrSnippet for C {
     }
 
     async fn try_or_continue(&self, content: &str) -> Either<Runner, Mismatch> {
-        let start = match (content.contains("```c"), content.contains("```c")) {
-            (true, _) => content.find("```c").expect("BUG: impossible") + "```c".len(),
-            (false, true) => content.find("```c").expect("BUG: impossible") + "```c".len(),
-            _ => return Either::Right(Mismatch::Continue),
+        let start = if content.contains("```c") {
+            content.find("```c").expect("BUG: impossible") + "```c".len()
+        } else {
+            return Either::Right(Mismatch::Continue);
         };
 
         let end = match content.rfind("```") {
