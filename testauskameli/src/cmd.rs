@@ -73,16 +73,19 @@ macro_rules! run_cmd {
             .arg("env")
             .arg(&format!(
                 "KAMELI_FILELIMIT={}",
-                $self.file_limit.to_string()
+                std::env::var("KAMELI_FILELIMIT").unwrap_or($self.file_limit.to_string())
             ))
-            .arg(&format!("KAMELI_MEMLIMIT={}", $self.mem_limit.to_string()))
+            .arg(&format!(
+                "KAMELI_MEMLIMIT={}",
+                std::env::var("KAMELI_MEMLIMIT").unwrap_or($self.mem_limit.to_string())
+            ))
             .arg(&format!(
                 "KAMELI_TIMELIMIT={}",
-                $self.time_limit.to_string()
+                std::env::var("KAMELI_TIMELIMIT").unwrap_or($self.time_limit.to_string())
             ))
             .arg(&format!(
                 "KAMELI_PROCESSLIMIT={}",
-                $self.proc_limit.to_string()
+                std::env::var("KAMELI_PROCESSLIMIT").unwrap_or($self.proc_limit.to_string())
             ))
             // this needs a better solution
             // TODO: unhardcore
