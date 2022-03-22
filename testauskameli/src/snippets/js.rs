@@ -48,18 +48,16 @@ impl MrSnippet for JS {
 
                 let output = output.await?;
 
+                let mut stdout = String::from_utf8(output.stdout).unwrap();
+                stdout.truncate(1900);
                 if output.status.success() {
                     info!("JS finished with (great)success");
-                    let mut stdout = String::from_utf8(output.stdout).unwrap();
-                    stdout.truncate(1900);
                     Ok(RunnerOutput::Output(stdout))
                 } else {
                     info!("JS finished with error");
                     let mut stderr = String::from_utf8(output.stderr).unwrap();
                     stderr.truncate(1950);
-                    // TODO: there might still be some output, ie. in case of Rust with warnings,
-                    //       so it should be included and processed correctly in those cases
-                    Ok(RunnerOutput::WithError(String::new(), stderr))
+                    Ok(RunnerOutput::WithError(stdout, stderr))
                 }
             })
         }))
