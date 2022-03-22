@@ -1,0 +1,7 @@
+#!/bin/sh
+# Compile and run a JS program
+# $1 = filename
+# $2 = extension (unused)
+
+cp "$1" main.js
+timeout -s KILL "$KAMELI_TIMELIMIT" s6-softlimit -a "$KAMELI_MEMLIMIT" -f "$KAMELI_FILELIMIT" -p "$KAMELI_PROCESSLIMIT" node main.js || exit 1
