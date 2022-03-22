@@ -1,5 +1,5 @@
 //! A default implementation for generating memes with "No bitches?" Megamind
-use anyhow::Result;
+use anyhow::{bail, Result};
 use async_trait::async_trait;
 use either::Either;
 
@@ -12,6 +12,7 @@ use rusttype::{Font, Scale};
 use std::cmp::min;
 use std::fs::File;
 use std::io::Read;
+use std::path::Path;
 
 use crate::utils;
 use crate::{Mismatch, MrSnippet, Runner, RunnerOutput};
@@ -34,17 +35,17 @@ impl NoMeme {
 #[async_trait]
 impl MrSnippet for NoMeme {
     fn dependencies(&self) -> Result<()> {
-        // TODO:
-        //     - check for dependencies if there are any
-        //      (would we include s6 tools here?)
-        Ok(())
+        if Path::new("img/no.png").exists() {
+            Ok(())
+        } else {
+            bail!("img/no.png missing")
+        }
     }
 
     fn name(&self) -> &'static str {
         "no meme"
     }
 
-    // TODO: make much better
     async fn try_or_continue(&self, content: &str) -> Either<Runner, Mismatch> {
         let text = if let Some(cap) = self.regex.captures_iter(content).next() {
             cap.get(1).unwrap().as_str().to_string()

@@ -5,6 +5,7 @@ use either::Either;
 use tracing::*;
 
 use crate::cmd::Command;
+use crate::utils;
 use crate::{Mismatch, MrSnippet, Runner, RunnerOutput};
 
 /// The service for C needs no data so far, and so it is a unit struct
@@ -13,8 +14,7 @@ pub struct C;
 #[async_trait]
 impl MrSnippet for C {
     fn dependencies(&self) -> Result<()> {
-        // TODO: Everyone has gcc installed, right?
-        Ok(())
+        utils::needed_programs(&["gcc", "c-runner"])
     }
 
     fn name(&self) -> &'static str {

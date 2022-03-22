@@ -5,6 +5,7 @@ use either::Either;
 use tracing::*;
 
 use crate::cmd::Command;
+use crate::utils;
 use crate::{Mismatch, MrSnippet, Runner, RunnerOutput};
 
 /// The service for JS needs no data so far, and so it is a unit struct
@@ -13,8 +14,7 @@ pub struct JS;
 #[async_trait]
 impl MrSnippet for JS {
     fn dependencies(&self) -> Result<()> {
-        // TODO: Everyone has node installed, right?
-        Ok(())
+        utils::needed_programs(&["js-runner", "node"])
     }
 
     fn name(&self) -> &'static str {
