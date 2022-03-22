@@ -181,6 +181,24 @@ pub trait Executor {
     ///
     /// You can also just kill the process, it's fine
     async fn run(&self, receiver: Receiver<(String, Self::Context)>) {
+        let mut had_errors = false;
+        for handler in self.iter() {
+            match handler.dependencies() {
+                Ok(()) => {
+                    info!("dep check ok: {}", handler.name())
+                }
+                Err(e) => {
+                    error!("dep check failed: {}: {}", handler.name(), e);
+                    had_errors = true;
+                }
+            }
+        }
+
+        if had_errors {
+            error!("handlers have unsatisfied dependencies, shutting down");
+            return;
+        }
+
         while let Ok((message, context)) = receiver.recv_async().await {
             info!("recv message");
 
