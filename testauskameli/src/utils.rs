@@ -1,6 +1,11 @@
 //! Random util functions to make life easier
+use anyhow::{anyhow, Result};
+use itertools::Itertools;
 use rand::{distributions::Alphanumeric, Rng};
+use which::which;
+
 use std::env;
+use std::ffi::OsStr;
 use std::path::PathBuf;
 
 /// Generate a random temporary file path with extension
@@ -22,4 +27,25 @@ pub fn rand_path_with_extension(extension: &str) -> PathBuf {
             .chain(extension)
             .collect::<String>(),
     )
+}
+
+/// Validate program presence
+pub fn needed_programs<T: AsRef<OsStr>>(binaries: &[T]) -> Result<()> {
+    let errors = binaries
+        .into_iter()
+        .map(|x| (x, which(x)))
+        .filter_map(|(x, result)| result.err().map(|_| x))
+        .collect::<Vec<_>>();
+
+    if errors.is_empty() {
+        Ok(())
+    } else {
+        Err(anyhow!(
+            "missing binaries: {}",
+            errors
+                .into_iter()
+                .flat_map(|x| x.as_ref().to_str())
+                .join(",")
+        ))
+    }
 }
