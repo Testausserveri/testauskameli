@@ -5,9 +5,13 @@ Testausserverin siistein botti
 
 ## Ominaisuuksia
 
-### Haskell ajuri
-Kun pingaat kamelin viestiin, jossa on Haskell-koodipalikka
+### Kieliajurit
+Kun pingaat kamelin viestiin, jossa on tuetun kielen koodipalikka
 kameli yrittää ajaa kyseisen koodin ja tulostaa vastausviestiin sen tulosteen ja mahdolliset virheet.
+
+Tuetut kielet:
+- Haskell
+- C
 
 ### Meemi generaattori
 Kun pingaat kamelin viestiin, joka toteutaa regexin "no\s+(.*)?\?",
