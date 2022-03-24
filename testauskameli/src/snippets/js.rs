@@ -5,6 +5,7 @@ use either::Either;
 use tracing::*;
 
 use crate::cmd::Command;
+use crate::utils;
 use crate::{Mismatch, MrSnippet, Runner, RunnerOutput};
 
 /// The service for JS needs no data so far, and so it is a unit struct
@@ -13,8 +14,7 @@ pub struct JS;
 #[async_trait]
 impl MrSnippet for JS {
     fn dependencies(&self) -> Result<()> {
-        // TODO: Everyone has node installed, right?
-        Ok(())
+        utils::needed_programs(&["js-runner", "node"])
     }
 
     fn name(&self) -> &'static str {
@@ -22,10 +22,10 @@ impl MrSnippet for JS {
     }
 
     async fn try_or_continue(&self, content: &str) -> Either<Runner, Mismatch> {
-        let start = match (content.contains("```js"), content.contains("```js")) {
-            (true, _) => content.find("```js").expect("BUG: impossible") + "```js".len(),
-            (false, true) => content.find("```js").expect("BUG: impossible") + "```js".len(),
-            _ => return Either::Right(Mismatch::Continue),
+        let start = if content.contains("```js") {
+            content.find("```js").expect("BUG: impossible") + "```js".len()
+        } else {
+            return Either::Right(Mismatch::Continue);
         };
 
         let end = match content.rfind("```") {
@@ -48,18 +48,16 @@ impl MrSnippet for JS {
 
                 let output = output.await?;
 
+                let mut stdout = String::from_utf8(output.stdout).unwrap();
+                stdout.truncate(1900);
                 if output.status.success() {
                     info!("JS finished with (great)success");
-                    let mut stdout = String::from_utf8(output.stdout).unwrap();
-                    stdout.truncate(1900);
                     Ok(RunnerOutput::Output(stdout))
                 } else {
                     info!("JS finished with error");
                     let mut stderr = String::from_utf8(output.stderr).unwrap();
                     stderr.truncate(1950);
-                    // TODO: there might still be some output, ie. in case of Rust with warnings,
-                    //       so it should be included and processed correctly in those cases
-                    Ok(RunnerOutput::WithError(String::new(), stderr))
+                    Ok(RunnerOutput::WithError(stdout, stderr))
                 }
             })
         }))

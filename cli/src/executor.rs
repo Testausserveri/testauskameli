@@ -43,12 +43,18 @@ impl Executor for CliExecutor {
             }
             RunnerOutput::WithError(text, error) => {
                 info!("output type: WithError");
-                println!("Output:\n\n{}\nError:{}", text, error);
+                if text.trim().is_empty() {
+                    println!("Error:\n{}\n", error);
+                } else {
+                    println!("Output:\n\n{}\nError:\n{}", text, error);
+                }
             }
             RunnerOutput::WithFiles(text, files, delete) => {
                 info!("output type: WithFiles");
-                println!("Output:\n\n{}\n", text);
-                println!("The following files were also created");
+                if !text.trim().is_empty() {
+                    println!("Output:\n\n{}\n", text);
+                }
+                println!("The following files were created");
                 for file in files {
                     println!("    - {}", file.display());
                 }

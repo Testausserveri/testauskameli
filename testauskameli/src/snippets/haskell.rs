@@ -5,6 +5,7 @@ use either::Either;
 use tracing::*;
 
 use crate::cmd::Command;
+use crate::utils;
 use crate::{Mismatch, MrSnippet, Runner, RunnerOutput};
 
 /// The service for Haskell needs to data so far, and so it is a unit struct
@@ -13,12 +14,7 @@ pub struct Haskell;
 #[async_trait]
 impl MrSnippet for Haskell {
     fn dependencies(&self) -> Result<()> {
-        // TODO:
-        //    - check for haskell install
-        //    - check for haskell runner script
-        //    - idk if anything else will be needed
-        //      (would we include s6 tools here?)
-        Ok(())
+        utils::needed_programs(&["ghc", "haskell-runner"])
     }
 
     fn name(&self) -> &'static str {
@@ -59,18 +55,16 @@ impl MrSnippet for Haskell {
 
                 let output = output.await?;
 
+                let mut stdout = String::from_utf8(output.stdout).unwrap();
+                stdout.truncate(1900);
                 if output.status.success() {
                     info!("Haskell finished with success");
-                    let mut stdout = String::from_utf8(output.stdout).unwrap();
-                    stdout.truncate(1900);
                     Ok(RunnerOutput::Output(stdout))
                 } else {
                     info!("Haskell finished with error");
                     let mut stderr = String::from_utf8(output.stderr).unwrap();
                     stderr.truncate(1950);
-                    // TODO: there might still be some output, ie. in case of Rust with warnings,
-                    //       so it should be included and processed correctly in those cases
-                    Ok(RunnerOutput::WithError(String::new(), stderr))
+                    Ok(RunnerOutput::WithError(stdout, stderr))
                 }
             })
         }))
