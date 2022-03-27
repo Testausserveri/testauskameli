@@ -44,7 +44,10 @@ impl Executor for DiscordExecutor {
         match content {
             RunnerOutput::Output(text) => {
                 message
-                    .reply(&context.http, format!("Output:\n```\n{}\n```", text))
+                    .reply(
+                        &context.http,
+                        format!("Output:\n```\n{}\n```", text.replace("`", "\\`")),
+                    )
                     .await?;
             }
             RunnerOutput::WithError(output, error) => {
@@ -52,11 +55,12 @@ impl Executor for DiscordExecutor {
                     .reply(
                         &context.http,
                         if output.trim().is_empty() {
-                            format!("Error:\n```\n{}\n\n```", error)
+                            format!("Error:\n```\n{}\n\n```", error.replace("`", "\\`"))
                         } else {
                             format!(
                                 "Output:\n```\n{}\n\n```\nError:\n```\n{}\n```",
-                                output, error
+                                output.replace("`", "\\`"),
+                                error.replace("`", "\\`")
                             )
                         },
                     )
@@ -70,7 +74,7 @@ impl Executor for DiscordExecutor {
                             m.add_file(file);
                         }
                         if !output.trim().is_empty() {
-                            m.content(output);
+                            m.content(output.replace("`", "\\`"));
                         }
                         m.reference_message(message)
                     })
@@ -86,7 +90,10 @@ impl Executor for DiscordExecutor {
             }
             RunnerOutput::WrongUsage(error) => {
                 message
-                    .reply(&context.http, format!("Incorrect: {}", error))
+                    .reply(
+                        &context.http,
+                        format!("Incorrect: {}", error.replace("`", "\\`")),
+                    )
                     .await?;
             }
             RunnerOutput::None => (),
