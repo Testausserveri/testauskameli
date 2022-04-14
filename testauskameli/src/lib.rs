@@ -1,7 +1,7 @@
 //! A library for creating bots the handsome way.
 //!
 //! ***AGNOSTICALLY***
-#![feature(async_closure)]
+#![feature(async_closure, let_else, inline_const)]
 #![allow(clippy::new_without_default)]
 #![deny(missing_docs)]
 

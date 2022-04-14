@@ -22,11 +22,8 @@ impl MrSnippet for Lisp {
     }
 
     async fn try_or_continue(&self, content: &str) -> Either<Runner, Mismatch> {
-        let start = if content.contains("```lisp") {
-            content.find("```lisp").expect("BUG: impossible") + "```lisp".len()
-        } else {
-            return Either::Right(Mismatch::Continue);
-        };
+        let Some(start) = content.find("```lisp") else { return Either::Right(Mismatch::Continue) };
+        let start = start + const { "```lisp".len() };
 
         let end = match content.rfind("```") {
             Some(idx) => idx,
