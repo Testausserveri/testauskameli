@@ -27,7 +27,11 @@ which = "4.2.4"
 
 [features]
 default = ["snippets"]
-snippets = ["nomeme", "echo", "haskell"]
+snippets = ["nomeme", "echo", "haskell", "c", "js", "lisp", "idris"]
 nomeme = ["imageproc", "rusttype", "image", "regex"]
 echo = []
 haskell = []
+c = []
+js = []
+lisp = []
+idris = []

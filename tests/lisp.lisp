@@ -1,0 +1,3 @@
+```lisp
+(write-string "kameli")
+```

@@ -1,0 +1,7 @@
+#!/bin/sh
+# Run a Common Lisp program
+# $1 = filename
+# $2 = extension (unused)
+
+cp "$1" main.lisp
+timeout -s KILL "$KAMELI_TIMELIMIT" s6-softlimit -a "$KAMELI_MEMLIMIT" -f "$KAMELI_FILELIMIT" -p "$KAMELI_PROCESSLIMIT" clisp main.lisp || exit 1
