@@ -17,6 +17,7 @@ flume = "0.10.10"
 tempfile = "3.3.0"
 rand = "0.8.4"
 itertools = "0.10.3"
+reqwest = "0.11"
 
 # image deps
 imageproc = { version = "0.22.0", optional = true }
@@ -27,7 +28,7 @@ which = "4.2.4"
 
 [features]
 default = ["snippets"]
-snippets = ["nomeme", "echo", "haskell", "c", "js", "lisp", "idris"]
+snippets = ["nomeme", "echo", "haskell", "c", "js", "lisp", "idris", "h264ify"]
 nomeme = ["imageproc", "rusttype", "image", "regex"]
 echo = []
 haskell = []
@@ -35,3 +36,4 @@ c = []
 js = []
 lisp = []
 idris = []
+h264ify = []

@@ -38,26 +38,41 @@ impl Handler {
 
 #[async_trait]
 impl EventHandler for Handler {
+    async fn message(&self, ctx: Context, msg: Message) {
+        if msg.author.bot
+            || !msg.mentions_me(&ctx.http).await.unwrap_or(false) && msg.attachments.is_empty()
+        {
+            return;
+        }
+
+        let mut needs_recoding = Vec::new();
+        if !msg.attachments.is_empty() {
+            for a in &msg.attachments {
+                if let Some(ct) = &a.content_type {
+                    if ct.starts_with("video/") && a.height.is_none() {
+                        needs_recoding.push(a.url.clone());
+                    }
+                }
+            }
+        }
+
+        let mut send_string = msg.content.to_string();
+
+        if !needs_recoding.is_empty() {
+            send_string = format!("```h264ify{}```", needs_recoding.join("\n"));
+        }
+
+        if let Err(e) = self.sender.send_async((send_string, (ctx, msg))).await {
+            error!("failed to send data to executor, is it running? [{}]", e);
+        }
+    }
+
     async fn ready(&self, _: Context, ready: Ready) {
         info!("Connected as {}", ready.user.name);
     }
 
     async fn resume(&self, _: Context, _: ResumedEvent) {
         info!("Resumed");
-    }
-
-    async fn message(&self, ctx: Context, msg: Message) {
-        if msg.author.bot || !msg.mentions_me(&ctx.http).await.unwrap_or(false) {
-            return;
-        }
-
-        if let Err(e) = self
-            .sender
-            .send_async((msg.content.to_string(), (ctx, msg)))
-            .await
-        {
-            error!("failed to send data to executor, is it running? [{}]", e);
-        }
     }
 }
 

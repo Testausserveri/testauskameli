@@ -21,7 +21,7 @@ version = "1.13"
 features = ["macros", "rt-multi-thread", "signal"]
 
 [dependencies.openssl-sys]
-version = "0.9.7"
+version = "0.9.74"
 features = ["vendored"]
 
 [dependencies.serenity]
