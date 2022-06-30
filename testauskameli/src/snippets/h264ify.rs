@@ -56,6 +56,7 @@ impl MrSnippet for H264ify {
                     } else {
                         url
                     };
+                    let filename = &format!("/tmp/{}", &filename);
 
                     let mut original_video = File::create(&filename).unwrap();
                     let response = reqwest::get(url).await.unwrap();
