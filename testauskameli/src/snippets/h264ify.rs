@@ -51,7 +51,11 @@ impl MrSnippet for H264ify {
             // an error occurs on post-runner cleanup while tryng to delete and already deleted file
             Box::pin(async move {
                 for url in &urls {
-                    let filename = &url[(url.rfind('/').unwrap() + 1)..];
+                    let filename = if let Some(idx) = url.rfind('/') {
+                        &url[idx + 1..]
+                    } else {
+                        url
+                    };
 
                     let mut original_video = File::create(&filename).unwrap();
                     let response = reqwest::get(url).await.unwrap();
