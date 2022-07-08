@@ -39,9 +39,9 @@ impl Handler {
 #[async_trait]
 impl EventHandler for Handler {
     async fn message(&self, ctx: Context, msg: Message) {
-        if msg.author.bot
-            || !msg.mentions_me(&ctx.http).await.unwrap_or(false) && msg.attachments.is_empty()
-        {
+        let mentioned = msg.mentions_me(&ctx.http).await.unwrap_or(false);
+
+        if msg.author.bot || !mentioned && msg.attachments.is_empty() {
             return;
         }
 
@@ -60,6 +60,8 @@ impl EventHandler for Handler {
 
         if !needs_recoding.is_empty() {
             send_string = format!("```h264ify{}```", needs_recoding.join("\n"));
+        } else if !mentioned {
+            return;
         }
 
         if let Err(e) = self.sender.send_async((send_string, (ctx, msg))).await {
