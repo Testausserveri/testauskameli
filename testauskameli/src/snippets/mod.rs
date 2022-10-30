@@ -8,6 +8,7 @@ pub mod idris;
 pub mod js;
 pub mod lisp;
 pub mod nomeme;
+pub mod whois;
 
 /// Register every service currently available with default configuration
 pub fn register_all<T>(executor: &T)
@@ -22,4 +23,5 @@ where
     executor.register(Box::new(lisp::Lisp));
     executor.register(Box::new(nomeme::NoMeme::new()));
     executor.register(Box::new(echo::Echo));
+    executor.register(Box::new(whois::Whois));
 }
