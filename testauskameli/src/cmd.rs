@@ -168,9 +168,9 @@ impl Command {
     /// Will run in CWD if current_dir is unset
     pub fn run(self) -> impl Future<Output = IoResult<Output>> {
         if let Some(ref dir) = self.current_dir {
-            run_cmd!(self).arg(self.program).current_dir(dir).output()
+            run_cmd!(self).current_dir(dir).output()
         } else {
-            run_cmd!(self).arg(self.program).output()
+            run_cmd!(self).output()
         }
     }
 
