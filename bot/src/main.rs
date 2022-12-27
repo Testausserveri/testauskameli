@@ -4,6 +4,7 @@ use serenity::async_trait;
 use serenity::client::bridge::gateway::ShardManager;
 use serenity::model::channel::Message;
 use serenity::model::event::ResumedEvent;
+use serenity::model::gateway::GatewayIntents;
 use serenity::model::gateway::Ready;
 use serenity::prelude::*;
 use tracing::{error, info};
@@ -85,10 +86,13 @@ async fn main() {
 
     let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
 
-    let mut client = Client::builder(&token)
-        .event_handler(Handler::new())
-        .await
-        .expect("Err creating client");
+    let mut client = Client::builder(
+        &token,
+        GatewayIntents::non_privileged() | GatewayIntents::MESSAGE_CONTENT,
+    )
+    .event_handler(Handler::new())
+    .await
+    .expect("Err creating client");
 
     {
         let mut data = client.data.write().await;
