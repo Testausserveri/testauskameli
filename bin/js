@@ -4,4 +4,4 @@
 # $2 = extension (unused)
 
 cp "$1" main.js
-timeout -s KILL "$KAMELI_TIMELIMIT" s6-softlimit -a "$KAMELI_MEMLIMIT" -f "$KAMELI_FILELIMIT" -p "$KAMELI_PROCESSLIMIT" node main.js || exit 1
+timeout -s KILL "$KAMELI_TIMELIMIT" s6-softlimit -a "$KAMELI_MEMLIMIT" -f "$KAMELI_FILELIMIT" -p "$KAMELI_PROCESSLIMIT" deno run main.js || exit 1
