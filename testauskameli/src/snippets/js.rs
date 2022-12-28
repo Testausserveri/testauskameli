@@ -14,7 +14,7 @@ pub struct JS;
 #[async_trait]
 impl MrSnippet for JS {
     fn dependencies(&self) -> Result<()> {
-        utils::needed_programs(&["js-runner", "node"])
+        utils::needed_programs(&["js-runner", "deno"])
     }
 
     fn name(&self) -> &'static str {
