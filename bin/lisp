@@ -4,6 +4,7 @@
 # $2 = extension (unused)
 
 cp "$1" main.lisp
-ECODE=$(timeout -s KILL "$KAMELI_TIMELIMIT" s6-softlimit -a "$KAMELI_MEMLIMIT" -f "$KAMELI_FILELIMIT" -p "$KAMELI_PROCESSLIMIT" clisp main.lisp)
+timeout -s KILL "$KAMELI_TIMELIMIT" s6-softlimit -a "$KAMELI_MEMLIMIT" -f "$KAMELI_FILELIMIT" -p "$KAMELI_PROCESSLIMIT" clisp main.lisp
+ECODE=$?
 killall -9 -u "$(whoami)" > /dev/null
 exit $ECODE
