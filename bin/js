@@ -9,5 +9,5 @@ export DENO_DIR=$(pwd)/.cache
 cp "$1" main.js
 timeout -s KILL "$KAMELI_TIMELIMIT" deno run main.js
 ECODE=$?
-killall -9 -u "$(whoami)" > /dev/null
+killall -9 -u "$(whoami)" > /dev/null &
 exit $ECODE
