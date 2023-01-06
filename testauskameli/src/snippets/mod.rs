@@ -5,7 +5,6 @@ pub mod echo;
 pub mod h264ify;
 pub mod haskell;
 pub mod idris;
-pub mod js;
 pub mod lisp;
 pub mod nomeme;
 pub mod whois;
@@ -17,7 +16,6 @@ where
 {
     executor.register(Box::new(h264ify::H264ify));
     executor.register(Box::new(c::C));
-    executor.register(Box::new(js::JS));
     executor.register(Box::new(haskell::Haskell));
     executor.register(Box::new(idris::Idris));
     executor.register(Box::new(lisp::Lisp));

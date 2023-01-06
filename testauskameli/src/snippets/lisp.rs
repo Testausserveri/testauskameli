@@ -43,8 +43,8 @@ impl MrSnippet for Lisp {
                 // If you bind it to '_', they will be deleted before the runner even starts
                 // due to the ignore pattern implying an early dropped,
                 // this doesn't happen with "intentionally unused pattern", ie. _ident
-                let (output, _files) = Command::unlimited("lisp-runner")
-                    .run_with_content(code.as_bytes(), Some("lisp"));
+                let (output, _files) =
+                    Command::new("lisp-runner").run_with_content(code.as_bytes(), Some("lisp"));
 
                 info!("Run lisp");
 

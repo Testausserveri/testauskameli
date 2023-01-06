@@ -47,8 +47,8 @@ impl MrSnippet for Idris {
                 // If you bind it to '_', they will be deleted before the runner even starts
                 // due to the ignore pattern implying an early dropped,
                 // this doesn't happen with "intentionally unused pattern", ie. _ident
-                let (output, _files) = Command::unlimited("idris-runner")
-                    .run_with_content(code.as_bytes(), Some("hs"));
+                let (output, _files) =
+                    Command::new("idris-runner").run_with_content(code.as_bytes(), Some("hs"));
 
                 info!("Run idris");
 
