@@ -30,7 +30,7 @@ impl MrSnippet for Whois {
 
         Either::Left(Runner::new("whois", "whois", || {
             Box::pin(async move {
-                let output = Command::unlimited("whois").arg(domain).run();
+                let output = Command::new("whois").arg(domain).run();
 
                 let output = output.await?;
 

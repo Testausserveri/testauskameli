@@ -29,7 +29,7 @@ pub struct Command {
 ///
 /// Therefore, most run methods return a tuple of a future and `Files`, such as:
 /// ```rust,no_run
-/// let (output, _files) = Command::unlimited("haskell-runner")
+/// let (output, _files) = Command::new("haskell-runner")
 ///     .run_with_content(code.as_bytes(), Some("hs"));
 /// ```
 pub enum Files {
@@ -63,19 +63,6 @@ impl Command {
             time_limit: env::var("KAMELI_TIMELIMIT")
                 .map_or(Ok(10), |s| s.parse())
                 .expect("BUG: impossible"),
-            run_user: env::var("KAMELI_RUNUSER")
-                .unwrap_or_else(|_| env::var("USER").expect("BUG: should exist")),
-            current_dir: None,
-        }
-    }
-
-    /// Create a new [`Command`] which is almost unlimited
-    pub fn unlimited<S: AsRef<OsStr>>(program: S) -> Self {
-        Self {
-            program: program.as_ref().to_os_string(),
-            args: vec![],
-            // maybe we still want to limit time lmao
-            time_limit: 100,
             run_user: env::var("KAMELI_RUNUSER")
                 .unwrap_or_else(|_| env::var("USER").expect("BUG: should exist")),
             current_dir: None,

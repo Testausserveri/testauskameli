@@ -42,7 +42,7 @@ impl MrSnippet for C {
         Either::Left(Runner::new("c", "c", || {
             Box::pin(async move {
                 let (output, _files) =
-                    Command::unlimited("c-runner").run_with_content(code.as_bytes(), Some("c"));
+                    Command::new("c-runner").run_with_content(code.as_bytes(), Some("c"));
 
                 info!("Run c");
 

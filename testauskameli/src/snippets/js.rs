@@ -42,7 +42,7 @@ impl MrSnippet for JS {
         Either::Left(Runner::new("js", "js", || {
             Box::pin(async move {
                 let (output, _files) =
-                    Command::unlimited("js-runner").run_with_content(code.as_bytes(), Some("js"));
+                    Command::new("js-runner").run_with_content(code.as_bytes(), Some("js"));
 
                 info!("Run JS");
 
