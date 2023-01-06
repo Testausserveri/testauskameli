@@ -10,16 +10,10 @@ use std::process::Output;
 use async_process::Command as AsyncCommand;
 
 /// Command runner
-///
-/// Uses `sudo` and `s6-softlimit` to run commands
-/// as a different user and limit its resources from Mixu
 pub struct Command {
     program: OsString,
     args: Vec<OsString>,
-    proc_limit: usize,
-    mem_limit: usize,
     time_limit: usize,
-    file_limit: usize,
     run_user: String,
     current_dir: Option<PathBuf>,
 }
@@ -52,48 +46,9 @@ pub enum Files {
 // AsyncCommand has not nice cock api
 macro_rules! run_cmd {
     ($self:ident) => {
-        AsyncCommand::new("sudo")
-            .arg("-u")
-            .arg($self.run_user.to_string())
-            .arg("timeout")
-            .arg("-s")
-            .arg("KILL")
-            .arg($self.time_limit.to_string())
-            .arg("s6-softlimit")
-            .arg("-a")
-            .arg($self.mem_limit.to_string())
-            .arg("-f")
-            .arg($self.file_limit.to_string())
-            .arg("-p")
-            .arg($self.proc_limit.to_string())
-            .env("KAMELI_FILELIMIT", $self.file_limit.to_string())
-            .env("KAMELI_MEMLIMIT", $self.mem_limit.to_string())
-            .env("KAMELI_PROCESSLIMIT", $self.proc_limit.to_string())
+        AsyncCommand::new(&$self.program)
             .env("KAMELI_TIMELIMIT", $self.time_limit.to_string())
-            .arg("env")
-            .arg(&format!(
-                "KAMELI_FILELIMIT={}",
-                std::env::var("KAMELI_FILELIMIT").unwrap_or($self.file_limit.to_string())
-            ))
-            .arg(&format!(
-                "KAMELI_MEMLIMIT={}",
-                std::env::var("KAMELI_MEMLIMIT").unwrap_or($self.mem_limit.to_string())
-            ))
-            .arg(&format!(
-                "KAMELI_TIMELIMIT={}",
-                std::env::var("KAMELI_TIMELIMIT").unwrap_or($self.time_limit.to_string())
-            ))
-            .arg(&format!(
-                "KAMELI_PROCESSLIMIT={}",
-                std::env::var("KAMELI_PROCESSLIMIT").unwrap_or($self.proc_limit.to_string())
-            ))
-            // this needs a better solution
-            // TODO: unhardcore
-            .arg(&format!(
-                "GHC_ARGS={}",
-                std::env::var("GHC_ARGS").unwrap_or_default()
-            ))
-            .arg(&$self.program)
+            .env("KAMELI_RUNUSER", $self.run_user.to_string())
             .args($self.args.iter())
     };
 }
@@ -105,15 +60,6 @@ impl Command {
         Self {
             program: program.as_ref().to_os_string(),
             args: vec![],
-            proc_limit: env::var("KAMELI_PROCESSLIMIT")
-                .map_or(Ok(1), |s| s.parse())
-                .expect("BUG: impossible"),
-            mem_limit: env::var("KAMELI_MEMLIMIT")
-                .map_or(Ok(1000000000), |s| s.parse())
-                .expect("BUG: impossible"),
-            file_limit: env::var("KAMELI_FILELIMIT")
-                .map_or(Ok(40000), |s| s.parse())
-                .expect("BUG: impossible"),
             time_limit: env::var("KAMELI_TIMELIMIT")
                 .map_or(Ok(10), |s| s.parse())
                 .expect("BUG: impossible"),
@@ -128,9 +74,6 @@ impl Command {
         Self {
             program: program.as_ref().to_os_string(),
             args: vec![],
-            proc_limit: 100000,
-            mem_limit: 1000000000000,
-            file_limit: 100000000000,
             // maybe we still want to limit time lmao
             time_limit: 100,
             run_user: env::var("KAMELI_RUNUSER")
