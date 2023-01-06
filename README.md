@@ -13,7 +13,6 @@ Tuetut kielet:
 - C
 - Haskell
 - Idris2
-- JavaScript
 - Common Lisp
 
 ### Meemi generaattori
@@ -68,7 +67,6 @@ Seuraavat ohjelmistot tulevat olla ladattuna ja kamelin käytettävissä:
 3. snippettien vaatimat ohjelmistot:
     * ghc
     * gcc
-    * deno
     * idris2
     * chez
     * clisp
