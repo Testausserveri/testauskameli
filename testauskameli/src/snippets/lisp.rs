@@ -50,15 +50,13 @@ impl MrSnippet for Lisp {
 
                 let output = output.await?;
 
-                let mut stdout = String::from_utf8(output.stdout).unwrap();
-                stdout.truncate(1900);
+                let stdout = String::from_utf8(output.stdout).unwrap();
                 if output.status.success() {
                     info!("Lisp finished with success");
                     Ok(RunnerOutput::Output(stdout))
                 } else {
                     info!("Lisp finished with error");
-                    let mut stderr = String::from_utf8(output.stderr).unwrap();
-                    stderr.truncate(1950);
+                    let stderr = String::from_utf8(output.stderr).unwrap();
                     Ok(RunnerOutput::WithError(stdout, stderr))
                 }
             })

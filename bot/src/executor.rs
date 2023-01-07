@@ -42,7 +42,8 @@ impl Executor for DiscordExecutor {
         let (context, message) = context;
 
         match content {
-            RunnerOutput::Output(text) => {
+            RunnerOutput::Output(mut text) => {
+                text.truncate(1900);
                 message
                     .reply(
                         &context.http,
@@ -50,13 +51,16 @@ impl Executor for DiscordExecutor {
                     )
                     .await?;
             }
-            RunnerOutput::WithError(output, error) => {
+            RunnerOutput::WithError(mut output, mut error) => {
                 message
                     .reply(
                         &context.http,
                         if output.trim().is_empty() {
+                            error.truncate(1900);
                             format!("Error:\n```\n{}\n\n```", error.replace("`", "\\`"))
                         } else {
+                            output.truncate(900);
+                            error.truncate(900);
                             format!(
                                 "Output:\n```\n{}\n\n```\nError:\n```\n{}\n```",
                                 output.replace("`", "\\`"),
