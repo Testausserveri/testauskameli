@@ -75,9 +75,14 @@ impl MrSnippet for NoMeme {
                 let mut text = format!("NO {}?", text.to_uppercase());
                 let mut y = 10;
                 while !text.is_empty() {
-                    let e = min(text.len(), 17);
+                    let mut e = min(text.len(), 17);
+                    while !text.is_char_boundary(e) {
+                        e += 1;
+                    }
+
                     let k: String = text.drain(..e).collect();
-                    let x = (17 - k.len()) / 2;
+                    let x = (e - k.len()) / 2;
+
                     draw_text_mut(
                         &mut img,
                         Rgb::from([255u8, 255u8, 255u8]).to_rgba(),
