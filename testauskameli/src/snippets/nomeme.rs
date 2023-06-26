@@ -9,7 +9,7 @@ use imageproc::drawing::draw_text_mut;
 use regex::Regex;
 use rusttype::{Font, Scale};
 
-use std::cmp::min;
+use std::cmp::{max, min};
 use std::fs::File;
 use std::io::Read;
 use std::path::Path;
@@ -81,7 +81,7 @@ impl MrSnippet for NoMeme {
                     }
 
                     let k: String = text.drain(..e).collect();
-                    let x = (e - k.len()) / 2;
+                    let x = (max(17, e) - k.len()) / 2;
 
                     draw_text_mut(
                         &mut img,
