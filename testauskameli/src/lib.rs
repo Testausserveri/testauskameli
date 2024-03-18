@@ -206,7 +206,7 @@ pub trait Executor {
                 match handler.try_or_continue(&message).await {
                     Either::Left(runner) => {
                         // gentlemen, I like this syntax, so I am doing a funny on line 1
-                        let exec_result = async move || -> Result<()> {
+                        let exec_result: Result<()> = async move {
                             info!("match found: {}", handler.name());
                             let output = runner.dispatch().await?;
 
@@ -216,7 +216,7 @@ pub trait Executor {
                                 .context("failed to send message after success")?;
 
                             Ok(())
-                        }()
+                        }
                         .await;
 
                         if let Err(e) = exec_result {
