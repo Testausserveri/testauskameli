@@ -6,7 +6,7 @@ use serenity::model::channel::Message;
 use serenity::model::event::ResumedEvent;
 use serenity::model::gateway::GatewayIntents;
 use serenity::model::gateway::Ready;
-use serenity::prelude::*;
+use serenity::prelude::{Client, Context, EventHandler, Mutex, TypeMapKey};
 use tracing::{error, info};
 
 use testauskameli::snippets::register_all;
@@ -42,7 +42,17 @@ impl EventHandler for Handler {
     async fn message(&self, ctx: Context, msg: Message) {
         let mentioned = msg.mentions_me(&ctx.http).await.unwrap_or(false);
 
-        if msg.author.bot || !mentioned && msg.attachments.is_empty() {
+        let mut send_string = msg.content.to_string();
+        let latex_in = send_string.starts_with("$") && send_string.ends_with("$");
+        if msg.author.bot || (!mentioned && msg.attachments.is_empty() && !latex_in) {
+            return;
+        }
+
+        if latex_in {
+            send_string = format!("latex {}", send_string);
+            if let Err(e) = self.sender.send_async((send_string, (ctx, msg))).await {
+                error!("failed to send data to executor, is it running? [{}]", e);
+            }
             return;
         }
 
@@ -56,8 +66,6 @@ impl EventHandler for Handler {
                 }
             }
         }
-
-        let mut send_string = msg.content.to_string();
 
         if !needs_recoding.is_empty() {
             send_string = format!("```h264ify{}```", needs_recoding.join("\n"));
