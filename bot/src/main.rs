@@ -49,7 +49,7 @@ impl EventHandler for Handler {
         }
 
         if latex_in {
-            send_string = format!("latex {}", send_string);
+            send_string = format!("```latex {}```", send_string);
             if let Err(e) = self.sender.send_async((send_string, (ctx, msg))).await {
                 error!("failed to send data to executor, is it running? [{}]", e);
             }

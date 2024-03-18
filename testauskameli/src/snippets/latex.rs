@@ -25,7 +25,17 @@ impl MrSnippet for Latex {
             .to_string()
             .replace("$", "")
             .replace("latex ", "");
-        println!("Got latex: {}", latex);
+
+        let latex = if content.starts_with("```latex") {
+            content
+                .trim()
+                .to_string()
+                .replace("$", "")
+                .replace("```latex", "")
+                .replace("```", "")
+        } else {
+            return Either::Right(Mismatch::Continue);
+        };
 
         Either::Left(Runner::new("latex", "latex", || {
             Box::pin(async move {
