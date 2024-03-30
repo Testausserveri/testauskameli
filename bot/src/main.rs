@@ -43,16 +43,7 @@ impl EventHandler for Handler {
         let mentioned = msg.mentions_me(&ctx.http).await.unwrap_or(false);
 
         let mut send_string = msg.content.to_string();
-        let latex_in = send_string.starts_with("$") && send_string.ends_with("$");
-        if msg.author.bot || (!mentioned && msg.attachments.is_empty() && !latex_in) {
-            return;
-        }
-
-        if latex_in {
-            send_string = format!("```latex {}```", send_string);
-            if let Err(e) = self.sender.send_async((send_string, (ctx, msg))).await {
-                error!("failed to send data to executor, is it running? [{}]", e);
-            }
+        if msg.author.bot || !mentioned && msg.attachments.is_empty() {
             return;
         }
 

@@ -4,10 +4,22 @@ use crate::{Mismatch, MrSnippet, Runner, RunnerOutput};
 use anyhow::Result;
 use async_trait::async_trait;
 use either::Either;
+use regex::Regex;
 use tracing::*;
 
-/// The service for Latex is a unit struct
-pub struct Latex;
+/// Latex handler
+pub struct Latex {
+    regex: Regex,
+}
+
+impl Latex {
+    /// Create a new [`Latex`] handler.
+    pub fn new() -> Self {
+        Self {
+            regex: Regex::new(r"\$([^$]*)\$").unwrap(),
+        }
+    }
+}
 
 #[async_trait]
 impl MrSnippet for Latex {
@@ -20,19 +32,8 @@ impl MrSnippet for Latex {
     }
 
     async fn try_or_continue(&self, content: &str) -> Either<Runner, Mismatch> {
-        let latex = content
-            .trim()
-            .to_string()
-            .replace("$", "")
-            .replace("latex ", "");
-
-        let latex = if content.starts_with("```latex") {
-            content
-                .trim()
-                .to_string()
-                .replace("$", "")
-                .replace("```latex", "")
-                .replace("```", "")
+        let latex = if let Some(cap) = self.regex.captures_iter(content).next() {
+            cap.get(1).unwrap().as_str().to_string()
         } else {
             return Either::Right(Mismatch::Continue);
         };
