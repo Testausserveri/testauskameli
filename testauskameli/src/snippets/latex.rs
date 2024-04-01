@@ -32,9 +32,11 @@ impl MrSnippet for Latex {
     }
 
     async fn try_or_continue(&self, content: &str) -> Either<Runner, Mismatch> {
-        let latex = if let Some(cap) = self.regex.captures_iter(content).next() {
-            cap.get(1).unwrap().as_str().to_string()
-        } else {
+        let Some(Some(latex)) = self
+            .regex
+            .captures(content)
+            .map(|cap| cap.get(1).map(|g| g.as_str().to_string()))
+        else {
             return Either::Right(Mismatch::Continue);
         };
 
@@ -46,14 +48,14 @@ impl MrSnippet for Latex {
                     latex
                 );
 
-                let resp = reqwest::get(&url).await.unwrap();
+                let resp = reqwest::get(&url).await?;
 
                 if !resp.status().is_success() {
                     info!("Failed to get latex image");
                     let stderr = format!("Failed to get image, status: {}", resp.status());
                     Ok(RunnerOutput::WithError("Failed".to_string(), stderr))
                 } else {
-                    let data = resp.bytes().await.unwrap();
+                    let data = resp.bytes().await?;
 
                     let path = utils::rand_path_with_extension(".png");
                     let mut img = image::load_from_memory(&data).unwrap();
