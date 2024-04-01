@@ -23,5 +23,5 @@ where
     executor.register(Box::new(nomeme::NoMeme::new()));
     executor.register(Box::new(echo::Echo));
     executor.register(Box::new(whois::Whois));
-    executor.register(Box::new(latex::Latex));
+    executor.register(Box::new(latex::Latex::new()));
 }
