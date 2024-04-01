@@ -5,6 +5,7 @@ pub mod echo;
 pub mod h264ify;
 pub mod haskell;
 pub mod idris;
+pub mod latex;
 pub mod lisp;
 pub mod nomeme;
 pub mod whois;
@@ -22,4 +23,5 @@ where
     executor.register(Box::new(nomeme::NoMeme::new()));
     executor.register(Box::new(echo::Echo));
     executor.register(Box::new(whois::Whois));
+    executor.register(Box::new(latex::Latex::new()));
 }
