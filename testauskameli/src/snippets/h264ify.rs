@@ -79,6 +79,10 @@ impl MrSnippet for H264ify {
                             "3.0",
                             "-pix_fmt",
                             "yuv420p",
+                            "-c:a",
+                            "aac",
+                            "-b:a",
+                            "128k",
                             &format!("{}-fixed.mp4", &filename),
                         ])
                         .output()
