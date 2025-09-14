@@ -47,6 +47,8 @@ impl EventHandler for Handler {
             return;
         }
 
+        // TODO: context menu action to trigger manually?
+        // TODO: make this work again and also trigger on he-acc v2 audio
         let mut needs_recoding = Vec::new();
         if !msg.attachments.is_empty() {
             for a in &msg.attachments {
